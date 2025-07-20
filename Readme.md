@@ -92,8 +92,8 @@ export MONGO_INITDB_ROOT_USERNAME=root
 export MONGO_INITDB_ROOT_PASSWORD=<ROOT_PASSWORD>
 docker run -d \
   --name mongo \
-  -e MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME} \
-  -e MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD} \
+  -e MONGO_INITDB_ROOT_USERNAME=$MONGO_INITDB_ROOT_USERNAME \
+  -e MONGO_INITDB_ROOT_PASSWORD=$MONGO_INITDB_ROOT_PASSWORD \
   -v mongo_data:/data/db \
   --network=host \
   --restart=no \
@@ -104,8 +104,8 @@ docker run -d \
 
 ```bash
 docker exec -it mongo \
-  mongosh --username ${MONGO_INITDB_ROOT_USERNAME} \
-  --password ${MONGO_INITDB_ROOT_PASSWORD} \
+  mongosh --username $MONGO_INITDB_ROOT_USERNAME \
+  --password $MONGO_INITDB_ROOT_PASSWORD \
   --eval "rs.initiate()"
 ```
 
@@ -128,7 +128,7 @@ db.createUser({
 export MYSQL_ROOT_PASSWORD=<ROOT_PASSWORD>
 docker run -d \
   --name mysql \
-  -e MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD} \
+  -e MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD \
   -v mysql_data:/var/lib/mysql \
   --network=host \
   --restart=no \
@@ -156,7 +156,7 @@ docker run -d \
   -v redis_data:/data \
   --network=host \
   --restart=no \
-  redis:7.4-alpine --requirepass ${REDIS_PASSWORD}
+  redis:7.4-alpine --requirepass $REDIS_PASSWORD
 ```
 
 #### 2.4. MinIO (S3)
@@ -168,8 +168,8 @@ export MINIO_ROOT_USER=root
 export MINIO_ROOT_PASSWORD=<ROOT_PASSWORD>
 docker run -d \
   --name minio \
-  -e MINIO_ROOT_USER=${MINIO_ROOT_USER} \
-  -e MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD} \
+  -e MINIO_ROOT_USER=$MINIO_ROOT_USER \
+  -e MINIO_ROOT_PASSWORD=$MINIO_ROOT_PASSWORD \
   -v minio_data:/data \
   --network=host \
   --restart=no \
@@ -208,7 +208,7 @@ docker run -d \
 mkdir -p nginx/conf.d nginx/ssl
 
 # Chạy container tạm để copy file default.conf ra host
-docker run --rm nginx:1.29-alpine-perl cat /etc/nginx/conf.d/default.conf > $(pwd)/nginx/conf.d/default.conf
+docker run --rm nginx:1.28.0-alpine cat /etc/nginx/conf.d/default.conf > $HOME/nginx/conf.d/default.conf
 ```
 
 #### 2.4.2. Chạy nginx
@@ -216,10 +216,39 @@ docker run --rm nginx:1.29-alpine-perl cat /etc/nginx/conf.d/default.conf > $(pw
 ```bash
 docker run -d \
   --name nginx \
-  -v "$(pwd)/nginx/conf.d":"/etc/nginx/conf.d" \
-  -v "$(pwd)/nginx/ssl":"/etc/nginx/ssl" \
+  -v "$HOME/nginx/conf.d":"/etc/nginx/conf.d" \
+  -v "$HOME/nginx/ssl":"/etc/nginx/ssl" \
   -v "/var/www":"/var/www" \
   --network=host \
   --restart=no \
-  nginx:1.29-alpine-perl
+  nginx:1.28.0-alpine
+```
+
+## 3. Cài đặt Node
+
+### 3.1. Cài đặt NVM (Node Version Manager)
+
+```bash
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+
+nvm install 20 --lts
+nvm current
+```
+
+### 3.2. Cài đặt Yarn (Trình quản lý gói (package manager) dành cho JavaScript)
+
+```bash
+npm i -g yarn
+yarn --version
+```
+
+### 3.3. Cài đặt PM2 (Process Manager for Node.JS)
+
+```bash
+npm i -g pm2
+pm2 --version
 ```
