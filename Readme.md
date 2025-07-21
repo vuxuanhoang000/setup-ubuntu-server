@@ -120,6 +120,16 @@ db.createUser({
 });
 ```
 
+#### 2.1.4. Cài đặt MongoDB Database Tools
+
+- Tải Database Tools .deb package tại [MongoDB Download Center](https://www.mongodb.com/try/download/database-tools)
+- Ví dụ dưới đây dành cho `Ubuntu 22.04 x86_64`
+
+```bash
+curl -fsSL https://fastdl.mongodb.org/tools/db/mongodb-database-tools-ubuntu2204-x86_64-100.12.2.deb -o ~/mongodb-database-tools.deb
+sudo apt install ~/mongodb-database-tools.deb
+```
+
 ### 2.2. Mysql
 
 #### 2.2.1. Cấu hình và chạy mysql
