@@ -215,7 +215,7 @@ docker run -d \
 #### 2.4.1. Tạo thư mục lưu trữ cấu hình nginx
 
 ```bash
-mkdir -p nginx/conf.d nginx/ssl
+mkdir -p $HOME/nginx/conf.d $HOME/nginx/ssl $HOME/nginx/www
 
 # Chạy container tạm để copy file default.conf ra host
 docker run --rm nginx:1.28.0-alpine cat /etc/nginx/conf.d/default.conf > $HOME/nginx/conf.d/default.conf
@@ -228,7 +228,7 @@ docker run -d \
   --name nginx \
   -v "$HOME/nginx/conf.d":"/etc/nginx/conf.d" \
   -v "$HOME/nginx/ssl":"/etc/nginx/ssl" \
-  -v "/var/www":"/var/www" \
+  -v "$HOME/nginx/www":"/var/www" \
   --network=host \
   --restart=no \
   nginx:1.28.0-alpine
