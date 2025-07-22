@@ -112,12 +112,17 @@ docker exec -it mongo \
 #### 2.1.3. Script tạo một user chỉ có quyền truy cập vào một cơ sở dữ liệu
 
 ```js
-use <DATABASE>;
+var DB_NAME = '<DB-NAME>';
+var USERNAME = '<USERNAME>';
+var PASSWORD = '<PASSWORD>'
+
+use(DB_NAME);
 db.createUser({
-  user: "<USERNAME>",
-  pwd: "<PASSWORD>",
-  roles: [{ role: "dbOwner", db: "<DATABASE>" }],
+  user: USERNAME,
+  pwd: PASSWORD,
+  roles: [{ role: "dbOwner", db: DB_NAME }],
 });
+
 ```
 
 #### 2.1.4. Cài đặt MongoDB Database Tools
@@ -148,12 +153,30 @@ docker run -d \
 #### 2.2.2. Cách tạo một user chỉ có quyền truy cập vào một cơ sở dữ liệu
 
 ```sql
-CREATE USER '<USERNAME>'@'%' IDENTIFIED BY '<PASSWORD>';
+-- Đặt biến
+SET @username = '<USERNAME>';
+SET @password = '<PASSWORD>';
+SET @db_name   = '<DB-NAME>';
 
-CREATE DATABASE IF NOT EXISTS <DATABASE_NAME>;
+-- Tạo user
+SET @sql_create_user = CONCAT('CREATE USER "', @username, '"@"%" IDENTIFIED BY "', @password, '"');
+PREPARE stmt FROM @sql_create_user;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
 
-GRANT ALL PRIVILEGES ON <DATABASE_NAME>.* TO '<USERNAME>'@'%';
+-- Tạo database nếu chưa tồn tại
+SET @sql_create_db = CONCAT('CREATE DATABASE IF NOT EXISTS `', @db_name, '`');
+PREPARE stmt FROM @sql_create_db;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
 
+-- Cấp quyền
+SET @sql_grant = CONCAT('GRANT ALL PRIVILEGES ON `', @db_name, '`.* TO "', @username, '"@"%"');
+PREPARE stmt FROM @sql_grant;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+-- Áp dụng
 FLUSH PRIVILEGES;
 ```
 
