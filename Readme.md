@@ -94,6 +94,7 @@ docker run -d \
   --name mongo \
   -e MONGO_INITDB_ROOT_USERNAME=$MONGO_INITDB_ROOT_USERNAME \
   -e MONGO_INITDB_ROOT_PASSWORD=$MONGO_INITDB_ROOT_PASSWORD \
+  -v mongo_configdb:/data/configdb \
   -v mongo_data:/data/db \
   --network=host \
   --restart=no \
