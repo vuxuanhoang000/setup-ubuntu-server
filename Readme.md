@@ -153,30 +153,9 @@ docker run -d \
 #### 2.2.2. Cách tạo một user chỉ có quyền truy cập vào một cơ sở dữ liệu
 
 ```sql
--- Đặt biến
-SET @username = '<USERNAME>';
-SET @password = '<PASSWORD>';
-SET @db_name   = '<DB-NAME>';
-
--- Tạo user
-SET @sql_create_user = CONCAT('CREATE USER "', @username, '"@"%" IDENTIFIED BY "', @password, '"');
-PREPARE stmt FROM @sql_create_user;
-EXECUTE stmt;
-DEALLOCATE PREPARE stmt;
-
--- Tạo database nếu chưa tồn tại
-SET @sql_create_db = CONCAT('CREATE DATABASE IF NOT EXISTS `', @db_name, '`');
-PREPARE stmt FROM @sql_create_db;
-EXECUTE stmt;
-DEALLOCATE PREPARE stmt;
-
--- Cấp quyền
-SET @sql_grant = CONCAT('GRANT ALL PRIVILEGES ON `', @db_name, '`.* TO "', @username, '"@"%"');
-PREPARE stmt FROM @sql_grant;
-EXECUTE stmt;
-DEALLOCATE PREPARE stmt;
-
--- Áp dụng
+CREATE USER '<USERNAME>'@'%' IDENTIFIED BY '<PASSWORD>';
+CREATE DATABASE IF NOT EXISTS <DATABASE_NAME>;
+GRANT ALL PRIVILEGES ON <DATABASE_NAME>.* TO '<USERNAME>'@'%';
 FLUSH PRIVILEGES;
 ```
 
@@ -222,12 +201,12 @@ docker run -d \
 #### 2.4.1. Cấu hình và chạy minio
 
 ```bash
-export MINIO_ROOT_USER=root
-export MINIO_ROOT_PASSWORD=<ROOT_PASSWORD>
+export MINIO_USER=root
+export MINIO_PASSWORD=<ROOT_PASSWORD>
 docker run -d \
   --name minio \
-  -e MINIO_ROOT_USER=$MINIO_ROOT_USER \
-  -e MINIO_ROOT_PASSWORD=$MINIO_ROOT_PASSWORD \
+  -e MINIO_ROOT_USER=$MINIO_USER \
+  -e MINIO_ROOT_PASSWORD=$MINIO_PASSWORD \
   -v minio_data:/data \
   --network=host \
   --restart=no \
@@ -263,10 +242,10 @@ docker run -d \
 #### 2.4.1. Tạo thư mục lưu trữ cấu hình nginx
 
 ```bash
-mkdir -p $HOME/nginx/conf.d $HOME/nginx/ssl $HOME/nginx/www
+mkdir -p ./nginx/conf.d ./nginx/ssl ./nginx/www
 
 # Chạy container tạm để copy file default.conf ra host
-docker run --rm nginx:1.28.0-alpine cat /etc/nginx/conf.d/default.conf > $HOME/nginx/conf.d/default.conf
+docker run --rm nginx:1.28.0-alpine cat /etc/nginx/conf.d/default.conf > ./nginx/conf.d/default.conf
 ```
 
 #### 2.4.2. Chạy nginx
@@ -274,9 +253,9 @@ docker run --rm nginx:1.28.0-alpine cat /etc/nginx/conf.d/default.conf > $HOME/n
 ```bash
 docker run -d \
   --name nginx \
-  -v "$HOME/nginx/conf.d":"/etc/nginx/conf.d" \
-  -v "$HOME/nginx/ssl":"/etc/nginx/ssl" \
-  -v "$HOME/nginx/www":"/var/www" \
+  -v "$(pwd)/nginx/conf.d":"/etc/nginx/conf.d" \
+  -v "$(pwd)/nginx/ssl":"/etc/nginx/ssl" \
+  -v "$(pwd)/nginx/www":"/var/www" \
   --network=host \
   --restart=no \
   nginx:1.28.0-alpine
