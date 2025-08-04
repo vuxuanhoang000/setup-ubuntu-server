@@ -76,10 +76,12 @@ docker ps -a
 mkdir mongo && touch mongo/Dockerfile
 cat << EOF > mongo/Dockerfile
 FROM mongo:7.0.21
+
 RUN openssl rand -base64 756 > /data/replica.key
 RUN chmod 400 /data/replica.key
 RUN chown 999:999 /data/replica.key
-CMD [ "mongod", "--replSet", "rs0", "--keyFile", "/data/replica.key" ]
+
+CMD ["mongod", "--replSet", "rs0", "--keyFile", "/data/replica.key"]
 EOF
 
 docker build -t mongo -f mongo/Dockerfile .
@@ -88,12 +90,12 @@ docker build -t mongo -f mongo/Dockerfile .
 #### 2.1.2. Chạy mongo
 
 ```bash
-export MONGO_INITDB_ROOT_USERNAME=root
-export MONGO_INITDB_ROOT_PASSWORD=<ROOT_PASSWORD>
+export MONGO_USERNAME=root
+export MONGO_PASSWORD=<ROOT_PASSWORD>
 docker run -d \
   --name mongo \
-  -e MONGO_INITDB_ROOT_USERNAME=$MONGO_INITDB_ROOT_USERNAME \
-  -e MONGO_INITDB_ROOT_PASSWORD=$MONGO_INITDB_ROOT_PASSWORD \
+  -e MONGO_INITDB_ROOT_USERNAME=$MONGO_USERNAME \
+  -e MONGO_INITDB_ROOT_PASSWORD=$MONGO_PASSWORD \
   -v mongo_configdb:/data/configdb \
   -v mongo_data:/data/db \
   --network=host \
@@ -104,10 +106,7 @@ docker run -d \
 - Đợi Mongo vài giây để khởi tạo, sau đó tiếp tục.
 
 ```bash
-docker exec -it mongo \
-  mongosh --username $MONGO_INITDB_ROOT_USERNAME \
-  --password $MONGO_INITDB_ROOT_PASSWORD \
-  --eval "rs.initiate()"
+docker exec -it mongo mongosh -u $MONGO_USERNAME -p $MONGO_PASSWORD --eval "rs.initiate()"
 ```
 
 #### 2.1.3. Script tạo một user chỉ có quyền truy cập vào một cơ sở dữ liệu
@@ -183,14 +182,39 @@ FLUSH PRIVILEGES;
 
 ### 2.3. Redis
 
+#### 2.3.1. Tạo một image redis tùy chỉnh
+
 ```bash
+export REDIS_USERNAME=root
 export REDIS_PASSWORD=<ROOT_PASSWORD>
+mkdir redis && touch redis/Dockerfile
+cat << EOF > redis/Dockerfile
+FROM redis:7.4-alpine
+
+RUN mkdir -p /etc/redis
+
+# Append cấu hình vào redis.conf
+RUN echo "user default off" >> /etc/redis/redis.conf
+RUN echo "user $REDIS_USERNAME on >$REDIS_PASSWORD ~* +@all" >> /etc/redis/redis.conf
+
+RUN chmod 400 /etc/redis/redis.conf
+RUN chown 999:999 /etc/redis/redis.conf
+
+CMD ["redis-server", "/etc/redis/redis.conf"]
+EOF
+
+docker build -t redis -f redis/Dockerfile .
+```
+
+#### 2.3.2. Chạy redis
+
+```bash
 docker run -d \
   --name redis \
   -v redis_data:/data \
   --network=host \
   --restart=no \
-  redis:7.4-alpine --requirepass $REDIS_PASSWORD
+  redis
 ```
 
 #### 2.4. MinIO (S3)
@@ -266,7 +290,7 @@ docker run -d \
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
 
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 
 nvm install 20 --lts
