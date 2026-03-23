@@ -304,3 +304,15 @@ yarn --version
 npm i -g pm2
 pm2 --version
 ```
+
+### 3.4. Cài đặt Ollama
+
+```bash
+docker run -d --gpus all --name ollama \
+  --restart=always \
+  -v ollama:/root/.ollama \
+  -p 11434:11434 \
+  ollama/ollama:0.12.6
+docker exec -it ollama ollama pull qwen2.5:1.5b
+docker exec -it ollama ollama run qwen2.5:1.5b
+```
