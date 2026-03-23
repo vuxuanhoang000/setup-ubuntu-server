@@ -77,7 +77,22 @@ mkdir mongo && touch mongo/Dockerfile
 cat << EOF > mongo/Dockerfile
 FROM mongo:7.0.21
 
-RUN openssl rand -base64 756 > /data/replica.key
+RUN echo "zDw2R5tsTTjQD4AvE/bN89Oy1xkkA+WdPxuOgs5Rk4BdNnrKDwuHh+1PMuJMihwN" > /data/replica.key
+RUN echo "UuAKxmDExlg5l5TquxPTaSlvGUMI5tFzz38CL2F3F8AQ3cy4+cpiCDlOlxtjmiR8" >> /data/replica.key
+RUN echo "PUrdOmuAlyylVt1u01Vml8RNkQHh7dEgYdIAcJtzjCoBK7DDc8upYefCt19kIC39" >> /data/replica.key
+RUN echo "j9fcgF51xJIXm6dTKqmZ4Kg83Yfjy++l8jiZ+0e59qwxoOvysP1AvszVTdg36bmv" >> /data/replica.key
+RUN echo "p1FKzpvs5INlNZGKU+tZRqvFpWXkLgR087EOkIv7ltyf4MY+Fftrp/8vWpmzFOKq" >> /data/replica.key
+RUN echo "uqB9s9DKvZytRrt5Nv48QKgup4eB6xtt25dh+pN8+G6uPxxnFo6AZ1nfnaOX5Q+B" >> /data/replica.key
+RUN echo "TPaRwjTbFJxdpa0lK+ZdYksZccYzX8vOygRJSfqS9hC0WBOLJJGvnM91L1G+tzb6" >> /data/replica.key
+RUN echo "GMCu71etmYSSr+BiR7mT+EfnWgQCKGaeEbhg/bbhMKmUSmGmI2z5xRjyqFPmlWQ1" >> /data/replica.key
+RUN echo "vSdc2BgMiZW4vQD9S9rjDYFFZv3l20hzHaDG6CMFpKhb4LufWw1nOgVuiqsMJGTy" >> /data/replica.key
+RUN echo "g6gh62hrrE1cXSobyZBm7lhbnZMP+fc/Nu5n4L1cSxFw+omhFb3/FYor7exCGWKr" >> /data/replica.key
+RUN echo "UMOeH8iorw06vgU7cWbEYDOeTKSxNPrCfdtpFwGKCSPDuzYn7lLVlgYv2bnaHKlS" >> /data/replica.key
+RUN echo "SP4G0Dcnm+uCFV146UB6Z2t3Hdqu2Eg5R1/w+aFWqvXone/bsWO6527RxZNfaJic" >> /data/replica.key
+RUN echo "EA42TV9h++L4VOFvHwoMqsv0FgkvdajOIgHYKx2PGtKffxIRzldLn/lwduq4AmdY" >> /data/replica.key
+RUN echo "OkJ0V844y664zqU7+4mwEdoLxgcB3LmAJ6LbCxWZpvhA+9TUTjuLJPy8SqtT/cq6" >> /data/replica.key
+RUN echo "bQO0CYj8anwUvawxNET0srqYU54HZevK9z3usFsdZptiyElUMw3Fj9b370xs1Bgn" >> /data/replica.key
+RUN echo "FTsc3TDJPSn89zkDmUe493IojE8McE411ok/s4CRywEjUahf" >> /data/replica.key
 RUN chmod 400 /data/replica.key
 RUN chown 999:999 /data/replica.key
 
@@ -99,7 +114,7 @@ docker run -d \
   -v mongo_configdb:/data/configdb \
   -v mongo_data:/data/db \
   --network=host \
-  --restart=no \
+  --restart=always \
   mongo
 ```
 
@@ -146,7 +161,7 @@ docker run -d \
   -e MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD \
   -v mysql_data:/var/lib/mysql \
   --network=host \
-  --restart=no \
+  --restart=always \
   mysql:8.4.3
 ```
 
@@ -192,7 +207,7 @@ docker run -d \
   --name redis \
   -v redis_data:/data \
   --network=host \
-  --restart=no \
+  --restart=always \
   redis
 ```
 
@@ -257,7 +272,7 @@ docker run -d \
   -v "$(pwd)/nginx/ssl":"/etc/nginx/ssl" \
   -v "$(pwd)/nginx/www":"/var/www" \
   --network=host \
-  --restart=no \
+  --restart=always \
   nginx:1.28.0-alpine
 ```
 
