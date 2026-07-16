@@ -189,7 +189,7 @@ RUN mkdir -p /etc/redis
 
 # Append cấu hình vào redis.conf
 RUN echo "user default off" >> /etc/redis/redis.conf
-RUN echo "user $REDIS_USERNAME on >$REDIS_PASSWORD ~* +@all" >> /etc/redis/redis.conf
+RUN echo "user $REDIS_USERNAME on >$REDIS_PASSWORD ~* &* +@all" >> /etc/redis/redis.conf
 
 RUN chmod 400 /etc/redis/redis.conf
 RUN chown 999:999 /etc/redis/redis.conf
